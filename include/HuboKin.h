@@ -67,18 +67,29 @@ namespace HK {
                const Isometry3d &endEffector, 
 	       int fromFrame, int toFrame) const;
     
-    void armIK(Vector6d &q, const Isometry3d& B, 
+    void armIK(Vector6d &q, const Isometry3d &B, 
                const Vector6d& qPrev, int side) const;
 
-    void armIK(Vector6d &q, const Isometry3d& B, 
-               const Vector6d& qPrev, int side, 
+    void armIK(Vector6d &q, const Isometry3d &B, 
+               const Vector6d &qPrev, int side, 
                const Isometry3d &endEffector) const;
 
-    void armJacobian(Matrix66d &J, const Vector6d& q, int side, const Isometry3d &location) const;
+    void armJacobian(Matrix66d &J, const Vector6d &q, 
+		     int side, const Isometry3d &location) const;
+    
+    void armInvJacobian(Matrix66d& invJ, const Vector6d& q,
+    			int side, const Isometry3d &location) const;
+
+    void armDifferentialIK(Vector6d &dq, const Isometry3d &B, int eps,
+    			   const Vector6d& qPrev, int side) const;
+
+    void armDifferentialIK(Vector6d &dq, const Isometry3d &B, int eps,
+    			   const Vector6d &qPrev, int side,
+    			   const Isometry3d &endEffector) const;
 
     void legFK(Isometry3d &B, const Vector6d &q, int side) const;
 
-    void legIK(Vector6d &q, const Isometry3d& B, 
+    void legIK(Vector6d &q, const Isometry3d  &B, 
                const Vector6d& qPrev, int side) const;
 
 

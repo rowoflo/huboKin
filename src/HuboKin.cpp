@@ -666,6 +666,50 @@ namespace HK {
     }    
   }
 
+  void HuboKin::armInvJacobian(Matrix66d& invJ, const Vector6d &q, 
+  			       int side, const Isometry3d &location) const {
+    Matrix66d J;
+    armJacobian(J, q, side, location);
+    invJ = J.transpose();
+    cout << J.matrix() << endl << endl;
+  }
+
+  void HuboKin::armDifferentialIK(Vector6d &dq, const Isometry3d &B, int eps,
+  				  const Vector6d &qPrev, int side) const {
+    // Hand	
+    Isometry3d hand;
+    hand(0,0) =  1; hand(0,1) =  0; hand(0,2) = 0; hand(0,3) =   0;
+    hand(1,0) =  0; hand(1,1) =  0; hand(1,2) =-1; hand(1,3) =   0;
+    hand(2,0) =  0; hand(2,1) =  1; hand(2,2) = 0; hand(2,3) =   0;
+    hand(3,0) =  0; hand(3,1) =  0; hand(3,2) = 0; hand(3,3) =   1;
+
+    armDifferentialIK(dq, B, eps, qPrev, side, hand);
+
+  }
+
+  void HuboKin::armDifferentialIK(Vector6d &dq, const Isometry3d &B, int eps, 
+  				  const Vector6d &qPrev, int side,
+  				  const Isometry3d &endEffector) const {
+    Isometry3d BPrev;
+    Vector3d p;
+    Matrix66d invJ;
+
+    armFK(BPrev, qPrev, side, endEffector);
+    armInvJacobian(invJ, qPrev, side, BPrev);
+    p = B.translation() - BPrev.translation();
+    p = p/p.norm();
+    dq = eps*invJ.middleCols(0,3)*p;
+
+    cout << BPrev.matrix() << endl << endl;
+    cout << B.matrix() << endl << endl;
+    cout << invJ.matrix() << endl << endl;
+    cout << p << endl << endl;
+    cout << invJ.middleCols(0,3).matrix() << endl << endl;
+    cout << dq << endl << endl;
+    
+  }
+
+
   //  ==================================================================
   //  Leg Kinematics
   //  ==================================================================
@@ -760,7 +804,7 @@ namespace HK {
     }
   }
 
-  void HuboKin::legIK(Vector6d &q, const Isometry3d& B, const Vector6d& qPrev, int side) const {
+  void HuboKin::legIK(Vector6d &q, const Isometry3d &B, const Vector6d &qPrev, int side) const {
     Eigen::ArrayXXd qAll(6,8);
     
     // Declarations
